@@ -1,0 +1,194 @@
+    <!doctype html>
+    <html lang="tr">
+    <head>
+    <meta charset="utf-8">
+    <title>Hafıza Oyunu</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous">
+    </script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=1">
+    <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+    <link rel="stylesheet prefetch" href="https://fonts.googleapis.com/css?family=Coda">
+    <link rel="stylesheet" href="css/hafıza.css">
+    </head>
+    <body>
+
+    <div class="container">
+    <header>
+    <h1>Hafıza Oyunu</h1>
+    <section class="score-panel">
+
+        <ul class="stars">
+    <li><i class="fa fa-star"></i></li>
+    <li><i class="fa fa-star"></i></li>
+    <li><i class="fa fa-star"></i></li>
+    </ul>
+    
+        <span class="Hamle">0</span> Hamle
+        <div class="restart">
+        Tekrar
+    <i class="fa fa-repeat"></i>
+            </div>
+
+        <span class="timer">
+
+        00:00:00
+
+        </span>
+    </section>
+    </header>
+   <div class="modal">
+   <div class="modal-content">
+       <h2 class="modal-title">Süpeeerrr !</h2>
+       <p class="modal-message">KAZANDIN !</p>
+  <div class="modal-element">
+      <span>Time :</span>
+       </div>
+       <div class="modal-element">
+           <span>Hamle :</span>
+       </div>
+       <div class="modal-element">
+           <span> Stars :</span> 
+        </div>
+       </div>
+    </div>
+   </div>
+   </body>
+    <script>
+   
+    var Cards = ["fa fa-heart","fa fa-hourglass","fa fa-key","fa fa-mortar-board","fa fa-smile-o","fa fa-key","fa fa-percent","fa fa-paw","fa fa-heart","fa fa-eye","fa fa-percent","fa fa-eye","fa fa-mortar-board","fa fa-paw","fa fa-hourglass","fa fa-smile-o"];
+   
+    var OpenCards= [];
+   
+    var shuffleCards=[];
+    var tilesFlipped=0;
+    var numOfHamle=0;
+   
+    function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+    while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+    }
+    return array;
+    }
+    
+    shuffleCards = shuffle(Cards);
+    
+    var clearTime; 
+    var seconds = 0, minutes = 0, hours = 0;
+    var clearState; 
+    var secs, mins, gethours ; 
+    
+    function startWatch( ) {
+   
+    if ( seconds === 60 ) { seconds = 0; minutes = minutes + 1; }
+   
+    mins = ( minutes < 10 ) ? ( '0' + minutes + ': ' ) : ( minutes + ': ' );
+   
+    if ( minutes === 60 ) { minutes = 0; hours = hours + 1; }
+   
+    gethours = ( hours < 10 ) ? ( '0' + hours + ': ' ) : ( hours + ': ' );
+    secs = ( seconds < 10 ) ? ( '0' + seconds ) : ( seconds ); 
+    
+    var time =gethours + mins + secs;
+    $('.container').find('.timer').html(time);
+   
+    seconds++; 
+  
+    clearTime = setTimeout( "startWatch( )", 1000 ); } 
+   
+    function startTime( ) { 
+    
+    if ( seconds === 0 && minutes === 0 && hours === 0 ) {  
+    startWatch( );
+    } }
+
+
+    function stopTime( ) { 
+   
+    if ( seconds !== 0 || minutes !== 0 || hours !== 0 ) { 
+   
+    var time = gethours + mins + secs;     
+    $('.container').find('.timer').html(time);
+   
+    var StarsModalElem=$('.modal-element').eq(2);
+    var HamleModalElem=$('.modal-element').eq(1);
+    var TimerModalElem=$('.modal-element').eq(0);
+    $('.stars').clone().appendTo(StarsModalElem);
+    $('.Hamle').clone().appendTo(HamleModalElem);
+    $('.timer').clone().appendTo(TimerModalElem);
+   
+    clearTimeout( clearTime ); }}  
+   
+    $('.container').append('<ul class="deck"></ul>');
+    for (var i = 0;i < Cards.length;i++) {
+    $('.deck').prepend('<li class="card"></li>'); 
+    }
+    $('.card').prepend('<i></i>');
+
+    for (var i = 0;i < Cards.length;i++) {
+    $('.card').eq(i).find('i').addClass(shuffleCards[i]);    
+    }
+
+   
+    $('.restart').click(function(){
+    location.reload();
+    });
+
+    
+    $('.deck').on('click','.card',function (event) {
+   
+    startTime();
+  
+    if ($(this).attr('class')==='card' && OpenCards.length<2){
+    
+    if (OpenCards.length===0) {
+    $(this).toggleClass('open');
+    OpenCards.push($(this).children().attr('class'));
+    }
+   
+    else if (OpenCards.length===1) {
+    $(this).toggleClass('open');
+    OpenCards.push($(this).children().attr('class'));
+    
+    if (OpenCards[0]=== OpenCards[1]) {
+    $('.card').filter($('.open')).toggleClass('open match');
+   
+    tilesFlipped=tilesFlipped + 2;
+    numOfHamle=numOfHamle+1;
+    $('.Hamle').text(numOfHamle);
+   
+    OpenCards= [];
+    }
+    else {
+    
+    function flipBack () {
+    $('.card').filter($('.open')).toggleClass('open');
+    OpenCards = [];
+    numOfHamle=numOfHamle+1;
+    $('.Hamle').text(numOfHamle);
+    }
+    setTimeout(flipBack, 600);
+    }
+    }
+   
+    if (numOfHamle >16 && numOfHamle < 25) {
+    var star3 =$('.stars').find('li').eq(2);
+    star3.css('color','black');
+    }
+    if (numOfHamle > 25) {
+    var star2 =$('.stars').find('li').eq(1);
+    star2.css('color','black');
+    }
+    
+    if (tilesFlipped === Cards.length) {
+    stopTime();
+    $('.modal').css('display','block');
+    }     
+    }
+    });
+    </script>
+    </html>
